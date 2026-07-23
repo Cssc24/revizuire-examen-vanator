@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revizuire · Examenul de vânător</title>
+<style>
+  :root{
+    --bg:#12180f; --bg2:#1a2213; --panel:#1f2a17; --panel2:#26331b;
+    --ink:#eef2e6; --ink-dim:#a9b79a; --line:#38492a;
+    --gold:#d6a94e; --gold-soft:#e7c579; --moss:#7fae55; --moss-deep:#4f7a34;
+    --rust:#c8623a; --wrong:#c8623a; --right:#7fae55;
+    --shadow:0 18px 50px rgba(0,0,0,.45);
+    --r:16px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(127,174,85,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(214,169,78,.08), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif;
+    line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+  h1,h2,h3{font-weight:600;letter-spacing:-.01em;margin:0}
+  .mono{font-family:"SF Mono",ui-monospace,"Roboto Mono",Menlo,monospace}
+  .sans{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+
+  /* ---------- HEADER ---------- */
+  header{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+  .antlers{position:absolute;inset:0;opacity:.13;pointer-events:none}
+  .hero{position:relative;padding:64px 0 40px}
+  .eyebrow{font-family:"SF Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--gold);margin-bottom:18px}
+  .hero h1{font-size:clamp(38px,7vw,68px);line-height:1.02}
+  .hero h1 em{font-style:italic;color:var(--gold-soft)}
+  .hero p{max-width:56ch;color:var(--ink-dim);font-size:18px;margin:18px 0 0}
+  .src{margin-top:22px;font-family:"SF Mono",monospace;font-size:11.5px;color:var(--ink-dim);
+    letter-spacing:.02em}
+  .src b{color:var(--moss)}
+
+  /* ---------- STATS STRIP ---------- */
+  .strip{display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--line);border-radius:var(--r);
+    margin:34px 0 0;overflow:hidden;background:rgba(255,255,255,.02)}
+  .strip .cell{flex:1 1 120px;padding:16px 18px;border-right:1px solid var(--line)}
+  .strip .cell:last-child{border-right:none}
+  .strip .n{font-size:26px;color:var(--gold-soft);font-weight:600}
+  .strip .l{font-family:"SF Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-dim);margin-top:4px}
+
+  /* ---------- NAV ---------- */
+  nav.tabs{position:sticky;top:0;z-index:30;background:rgba(18,24,15,.86);
+    backdrop-filter:blur(12px);border-bottom:1px solid var(--line);margin-top:40px}
+  .tabs-inner{display:flex;gap:6px;overflow-x:auto;padding:10px 20px;max-width:1000px;
+    margin:0 auto;scrollbar-width:none}
+  .tabs-inner::-webkit-scrollbar{display:none}
+  .tab{flex:0 0 auto;font-family:system-ui,sans-serif;font-size:13.5px;font-weight:600;
+    color:var(--ink-dim);background:transparent;border:1px solid transparent;border-radius:999px;
+    padding:8px 16px;cursor:pointer;white-space:nowrap;transition:.18s}
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:var(--bg);background:var(--gold);border-color:var(--gold)}
+
+  section.view{display:none;padding:44px 0 90px}
+  section.view.active{display:block;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+  .sec-head h2{font-size:30px}
+  .sec-head .tag{font-family:"SF Mono",monospace;font-size:11px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--gold)}
+  .sec-sub{color:var(--ink-dim);margin:0 0 26px;max-width:62ch}
+
+  /* ---------- CHAPTER PICKER ---------- */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+  .chip{font-family:system-ui,sans-serif;font-size:13px;font-weight:600;color:var(--ink-dim);
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 13px;
+    cursor:pointer;transition:.15s;display:flex;align-items:center;gap:8px}
+  .chip:hover{border-color:var(--moss);color:var(--ink)}
+  .chip.on{background:var(--moss-deep);border-color:var(--moss);color:#fff}
+  .chip .cnt{font-family:"SF Mono",monospace;font-size:10.5px;opacity:.7}
+
+  /* ---------- FLASHCARD ---------- */
+  .fc-stage{perspective:1600px;margin:0 auto;max-width:640px}
+  .fc{position:relative;width:100%;min-height:340px;cursor:pointer;
+    transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+  .fc.flip{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;
+    border:1px solid var(--line);padding:34px;display:flex;flex-direction:column;
+    box-shadow:var(--shadow)}
+  .face.front{background:linear-gradient(160deg,var(--panel2),var(--panel))}
+  .face.back{background:linear-gradient(160deg,#243016,#1b2411);transform:rotateY(180deg)}
+  .fc .q-tag{font-family:"SF Mono",monospace;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--gold)}
+  .fc .q{font-size:22px;line-height:1.32;margin:16px 0 auto}
+  .fc .opts{margin-top:18px;display:flex;flex-direction:column;gap:9px}
+  .fc .opt{font-family:system-ui,sans-serif;font-size:14.5px;color:var(--ink-dim);
+    padding:9px 13px;border:1px solid var(--line);border-radius:10px;background:rgba(0,0,0,.15)}
+  .fc .ans-lbl{font-family:"SF Mono",monospace;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--moss)}
+  .fc .ans{font-size:23px;line-height:1.3;margin-top:14px;color:var(--gold-soft)}
+  .fc .hint{margin-top:auto;font-family:system-ui,sans-serif;font-size:12px;color:var(--ink-dim);
+    display:flex;align-items:center;gap:7px;opacity:.8}
+  .fc-ctl{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    max-width:640px;margin:22px auto 0}
+  .btn{font-family:system-ui,sans-serif;font-size:14px;font-weight:600;cursor:pointer;
+    border-radius:11px;padding:12px 20px;border:1px solid var(--line);background:var(--panel);
+    color:var(--ink);transition:.15s}
+  .btn:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .btn.primary{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+  .btn.primary:hover{background:var(--gold-soft);color:var(--bg)}
+  .btn:disabled{opacity:.35;cursor:not-allowed}
+  .counter{font-family:"SF Mono",monospace;font-size:13px;color:var(--ink-dim);min-width:78px;
+    text-align:center}
+  .fc-bar{height:4px;background:var(--line);border-radius:99px;max-width:640px;margin:16px auto 0;
+    overflow:hidden}
+  .fc-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--moss),var(--gold));
+    width:0;transition:width .3s}
+  .know-row{display:flex;gap:10px;justify-content:center;margin-top:14px}
+  .know{font-family:system-ui,sans-serif;font-size:13px;font-weight:600;padding:9px 16px;
+    border-radius:10px;cursor:pointer;border:1px solid var(--line);background:transparent;
+    color:var(--ink-dim);transition:.15s}
+  .know.no:hover{border-color:var(--rust);color:var(--rust)}
+  .know.yes:hover{border-color:var(--moss);color:var(--moss)}
+
+  /* ---------- QUIZ ---------- */
+  .quiz-card{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);
+    border-radius:20px;padding:30px;box-shadow:var(--shadow);max-width:680px;margin:0 auto}
+  .quiz-q{font-size:21px;line-height:1.34;margin:14px 0 22px}
+  .qopt{font-family:system-ui,sans-serif;font-size:15px;text-align:left;width:100%;cursor:pointer;
+    padding:14px 16px;margin-bottom:10px;border-radius:12px;border:1px solid var(--line);
+    background:rgba(0,0,0,.16);color:var(--ink);transition:.15s;display:flex;gap:12px;align-items:flex-start}
+  .qopt:hover:not(:disabled){border-color:var(--gold);background:rgba(214,169,78,.08)}
+  .qopt .k{font-family:"SF Mono",monospace;font-size:13px;color:var(--gold);font-weight:700;
+    flex:0 0 auto;margin-top:1px}
+  .qopt.right{border-color:var(--right);background:rgba(127,174,85,.16)}
+  .qopt.right .k{color:var(--right)}
+  .qopt.wrong{border-color:var(--wrong);background:rgba(200,98,58,.14)}
+  .qopt.wrong .k{color:var(--wrong)}
+  .qopt:disabled{cursor:default}
+  .quiz-next{margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .score{font-family:"SF Mono",monospace;font-size:13px;color:var(--ink-dim)}
+  .score b{color:var(--gold-soft)}
+  .result{text-align:center;padding:20px 0}
+  .result .big{font-size:56px;color:var(--gold-soft);font-weight:600}
+  .result .verdict{font-size:20px;margin-top:6px}
+  .result .pass{color:var(--moss)} .result .fail{color:var(--rust)}
+
+  /* ---------- KEY FACTS ---------- */
+  .facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+  .fact{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;
+    position:relative;overflow:hidden}
+  .fact::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
+  .fact h4{font-size:15px;color:var(--gold-soft);margin-bottom:8px;font-weight:600}
+  .fact ul{margin:0;padding-left:18px}
+  .fact li{font-family:system-ui,sans-serif;font-size:13.5px;color:var(--ink-dim);margin-bottom:5px;
+    line-height:1.45}
+  .fact li b{color:var(--ink);font-weight:600}
+
+  /* ---------- TABLE ---------- */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+  table{border-collapse:collapse;width:100%;min-width:520px;font-family:system-ui,sans-serif;font-size:13.5px}
+  thead th{background:var(--moss-deep);color:#fff;text-align:left;padding:11px 14px;font-weight:600;
+    position:sticky;top:0;font-size:12.5px;letter-spacing:.02em}
+  tbody td{padding:10px 14px;border-top:1px solid var(--line);color:var(--ink-dim)}
+  tbody tr:nth-child(even){background:rgba(255,255,255,.02)}
+  tbody td:nth-child(2){color:var(--ink);font-weight:600}
+  .badge{font-family:"SF Mono",monospace;font-size:11px;padding:2px 8px;border-radius:6px;
+    background:rgba(214,169,78,.14);color:var(--gold-soft);white-space:nowrap}
+
+  footer{border-top:1px solid var(--line);padding:30px 0 50px;color:var(--ink-dim);
+    font-family:system-ui,sans-serif;font-size:12.5px}
+  footer a{color:var(--moss)}
+  .disc{background:rgba(200,98,58,.08);border:1px solid rgba(200,98,58,.3);border-radius:12px;
+    padding:14px 16px;font-family:system-ui,sans-serif;font-size:13px;color:var(--ink-dim);margin-top:20px}
+  @media (max-width:640px){
+    .hero{padding:46px 0 30px}
+    .fc .q{font-size:19px}
+    .face{padding:24px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="antlers" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="none" stroke="#7fae55" stroke-width="2" stroke-linecap="round">
+      <path d="M600 300 L600 150 M600 170 C560 130 540 90 545 60 M600 190 C650 150 675 110 668 78 M600 150 C570 120 555 95 560 70 M600 150 C640 118 660 92 654 66 M545 60 C540 45 548 35 556 40 M668 78 C674 62 666 50 658 56"/>
+      <path d="M200 300 L200 200 M200 210 C175 185 165 160 170 145 M200 210 C230 182 245 158 238 142"/>
+      <path d="M1000 300 L1000 200 M1000 210 C975 185 965 160 970 145 M1000 210 C1030 182 1045 158 1038 142"/>
+    </g>
+  </svg>
+  <div class="wrap hero">
+    <div class="eyebrow">Permis de vânătoare · România</div>
+    <h1>Pregătește-te pentru <em>examenul de vânător</em></h1>
+    <p>Flashcards, teste-grilă pe capitole și fișe rapide, construite din programa oficială. Învață în ritmul tău și verifică-te ca la examenul real.</p>
+    <div class="src">Sursă: <b>Anexa nr. 5 la Ordinul 302/2014</b> (Anexa nr. 6 la Regulamentul permiselor de vânătoare), actualizată conform <b>Legii 171/2022</b> · Perioade: <b>Anexa nr. 1, Legea 407/2006</b></div>
+    <div class="strip">
+      <div class="cell"><div class="n">1000</div><div class="l">întrebări oficiale</div></div>
+      <div class="cell"><div class="n">30</div><div class="l">întrebări la examen</div></div>
+      <div class="cell"><div class="n">20</div><div class="l">corecte = promovat</div></div>
+      <div class="cell"><div class="n">8</div><div class="l">teme de studiu</div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tabs-inner" id="tabs"></div>
+</nav>
+
+<!-- FLASHCARDS -->
+<section class="view active" id="v-flash">
+  <div class="wrap">
+    <div class="sec-head"><h2>Flashcards</h2><span class="tag">învață activ</span></div>
+    <p class="sec-sub">Alege un capitol, citește întrebarea, gândește-te la răspuns și apoi întoarce cardul. Marchează dacă ai știut — cardurile pe care le ratezi se pot relua.</p>
+    <div class="chips" id="fc-chips"></div>
+
+    <div class="fc-stage">
+      <div class="fc" id="fc" onclick="flip()">
+        <div class="face front">
+          <div class="q-tag" id="fc-tag">—</div>
+          <div class="q" id="fc-q">Se încarcă…</div>
+          <div class="opts" id="fc-opts"></div>
+          <div class="hint">↻ Apasă pe card pentru răspuns</div>
+        </div>
+        <div class="face back">
+          <div class="ans-lbl">Răspuns corect</div>
+          <div class="ans" id="fc-a">—</div>
+          <div class="hint">↻ Apasă pentru a reveni</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fc-bar"><i id="fc-bar"></i></div>
+    <div class="fc-ctl">
+      <button class="btn" id="fc-prev" onclick="fcPrev()">← Înapoi</button>
+      <div class="counter" id="fc-count">0 / 0</div>
+      <button class="btn primary" id="fc-next" onclick="fcNext()">Următorul →</button>
+    </div>
+    <div class="know-row">
+      <button class="know no" onclick="mark(false)">✗ N-am știut</button>
+      <button class="know yes" onclick="mark(true)">✓ Am știut</button>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section class="view" id="v-quiz">
+  <div class="wrap">
+    <div class="sec-head"><h2>Test-grilă</h2><span class="tag">simulare</span></div>
+    <p class="sec-sub">10 întrebări extrase aleatoriu din capitolul ales. Alegi un răspuns, vezi imediat dacă e corect, iar la final primești scorul.</p>
+    <div class="chips" id="qz-chips"></div>
+    <div class="quiz-card" id="quiz-card"></div>
+  </div>
+</section>
+
+<!-- KEY FACTS -->
+<section class="view" id="v-facts">
+  <div class="wrap">
+    <div class="sec-head"><h2>Fișe rapide</h2><span class="tag">de memorat</span></div>
+    <p class="sec-sub">Cifrele și noțiunile care revin cel mai des în întrebări. Perfecte pentru repetat înainte de examen.</p>
+    <div class="facts" id="facts"></div>
+  </div>
+</section>
+
+<!-- PERIODS -->
+<section class="view" id="v-per">
+  <div class="wrap">
+    <div class="sec-head"><h2>Perioade de vânătoare</h2><span class="tag">Anexa 1</span></div>
+    <p class="sec-sub">Datele legale de deschidere și închidere pe specii. T1 = ian–mar · T2 = apr–iun · T3 = iul–sep · T4 = oct–dec.</p>
+    <h3 style="font-size:18px;color:var(--gold-soft);margin:8px 0 12px">Mamifere</h3>
+    <div class="tbl-wrap"><table id="tbl-mam"></table></div>
+    <h3 style="font-size:18px;color:var(--gold-soft);margin:28px 0 12px">Păsări</h3>
+    <div class="tbl-wrap"><table id="tbl-pas"></table></div>
+    <div class="disc"><b>Atenție:</b> perioadele pot fi restrânse sau extinse prin ordin al administratorului (art. 26 alin. 2). Speciile din Anexa nr. 2 (urs, lup, râs, pisică sălbatică, zimbru) sunt strict protejate — doar prin derogare.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Instrument de studiu neoficial, construit pentru pregătirea personală a examenului de vânător. Întrebările provin din setul oficial publicat de Ministerul Mediului, Apelor și Pădurilor. Verifică întotdeauna forma la zi a legislației înainte de examen.
+  </div>
+</footer>
+
+<script>
+/* ============ DATE: întrebări oficiale (subset reprezentativ) ============ */
+/* format: [întrebare, [opțiuni a,b,c], index corect] */
+const DATA = {
+  "mamifere-mari": {
+    label:"Mamifere mari", cnt:"120+",
+    q:[
+      ["Durata creșterii coarnelor cerbului comun este de:",["60-70 zile","90-100 zile","120-130 zile"],2],
+      ["Împerecherea cerbului comun se desfășoară în perioada:",["septembrie-octombrie","iulie-august","noiembrie-decembrie"],0],
+      ["Longevitatea cerbului comun este de:",["aproximativ 10 ani","aproximativ 15 ani","aproximativ 20 de ani"],2],
+      ["Cerbul comun își leapădă coarnele în perioada:",["decembrie-ianuarie","septembrie-octombrie","februarie-martie"],2],
+      ["Prădătorul cel mai important al cerbului comun este:",["ursul","râsul","lupul"],2],
+      ["Perioada de fătare a ciutelor de cerb comun este:",["martie-aprilie","aprilie-mai","mai-iunie"],2],
+      ["Durata gestației la ciutele de cerb comun este de:",["28 de săptămâni","34 de săptămâni","40 de săptămâni"],1],
+      ["Greutatea cerbului comun la apogeu este în medie de:",["250 kg","180 kg","140 kg"],0],
+      ["„Raza lupului” apare la:",["cerbul comun","cerbul lopătar","căprior"],0],
+      ["Ritualul de împerechere la cerbul comun se numește:",["boncănit","gonit","alergat"],0],
+      ["Vârsta la care coarnele cerbului lopătar ating dezvoltarea maximă este:",["5-6 ani","9-10 ani","14-16 ani"],1],
+      ["Perioada de împerechere a cerbului lopătar este:",["octombrie-noiembrie","august-septembrie","ianuarie-februarie"],0],
+      ["Longevitatea cerbului lopătar este de:",["10-12 ani","14-16 ani","20-25 ani"],2],
+      ["Căderea coarnelor la masculul de lopătar (peste 2 ani) are loc în luna:",["februarie","aprilie","decembrie"],1],
+      ["Cele mai mari efective de lopătar se găsesc în:",["Subcarpații Getici","Câmpia Olteniei","Câmpia de Vest"],2],
+      ["Durata creșterii coarnelor căpriorului este de:",["60 zile","80-90 zile","120-130 zile"],2],
+      ["Împerecherea căpriorului se desfășoară de regulă în perioada:",["iulie-august","mai-iunie","septembrie-octombrie"],0],
+      ["Longevitatea căpriorului este de aproximativ:",["5 ani","10 ani","15 ani"],2],
+      ["Glasul masculului de căprior se numește:",["brăhnit","behăit","boncănit"],0],
+      ["Cornul de căprior dezvoltat normal are:",["două ramuri","trei ramuri","patru ramuri"],1],
+      ["Greutatea căpriorului la apogeu este în medie de:",["15 kg","30 kg","50 kg"],1],
+      ["Câți iezi fată de obicei o femelă de căprior?",["unul","doi","trei"],1],
+      ["Împerecherea la capra neagră se desfășoară în perioada:",["octombrie-noiembrie","iulie-august","august-septembrie"],0],
+      ["Vârsta caprei negre împușcate se apreciază:",["după inelele anuale de pe coarne + 1","după lungimea coarnelor","după grosimea coarnelor"],0],
+      ["La capra neagră coarnele cresc până la:",["5 ani","10 ani","sfârșitul vieții"],2],
+      ["Biotopul favorabil caprei negre este:",["limita superioară a pădurii și golul alpin","pădurile de munte","pășunile de munte"],0],
+      ["Coarnele caprei negre sunt specifice:",["doar masculilor","doar femelelor bătrâne","ambelor sexe"],2],
+      ["La muflon coarnele cresc până la:",["5 ani","10 ani","sfârșitul vieții"],2],
+      ["Împerecherea la muflon se desfășoară în perioada:",["octombrie-decembrie","martie-aprilie","mai-iulie"],0],
+      ["Din familia Cervidae fac parte:",["cerb comun, cerb lopătar și capra neagră","cerb lopătar, capra neagră și căprior","cerb comun, cerb lopătar și căprior"],2],
+      ["Cel mai slab simț al mistrețului este:",["mirosul","auzul","văzul"],2],
+      ["Biotopul favorabil mistrețului în România este:",["pădurile de rășinoase","pădurile întinse de foioase","stepa"],1],
+      ["La mistreț, colții armă sunt:",["malformație a maxilarului","caninii de pe maxilarul inferior","caninii de pe maxilarul superior"],1],
+      ["Gestația la mistreț durează:",["10 săptămâni","14 săptămâni","16-17 săptămâni"],2],
+      ["Ciurda de mistreți este condusă de:",["perechea conducătoare","vierul cel mai bătrân","scroafa cea mai în vârstă"],2],
+      ["Mistrețul se poate încrucișa dând pui viabili cu:",["porcul domestic","câinele","capra"],0],
+      ["Câte specii de urs există în libertate în România?",["o specie","două specii","trei specii"],0],
+      ["Cel mai slab simț dezvoltat la urs este:",["mirosul","auzul","văzul"],2],
+      ["Perioada de împerechere la urs este:",["mai-iunie","august-septembrie","septembrie-octombrie"],0],
+      ["Ursoaica fată de regulă:",["în fiecare an","din doi în doi ani","din trei în trei ani"],1],
+      ["Gestația la femela de urs durează:",["șapte-opt luni","zece-unsprezece luni","cinci-șase luni"],0],
+      ["În hrana naturală a ursului predomină:",["fructele și semințele","carnea","iarba și furnicile"],0],
+      ["Ursul își amenajează pentru iarnă:",["vizuină","bârlog","culcuș"],1],
+      ["Haita de lupi este condusă de:",["masculul dominant","femela cea mai în vârstă","perechea conducătoare"],2],
+      ["Simțurile cele mai dezvoltate ale lupului sunt:",["gust și văz","miros și auz","văz și pipăit"],1],
+      ["Într-o haită de lupi, într-un ciclu, se împerechează:",["femela dominantă cu masculul dominant","toate femelele mature cu masculul dominant","toate exemplarele mature"],0],
+      ["Urmașii din încrucișarea lup × câine domestic sunt:",["fertili","sterili","nu se încrucișează"],0],
+      ["Împerecherea la râs are loc în lunile:",["decembrie-ianuarie","februarie-martie","iulie-august"],1],
+      ["Râsul prezintă gheare:",["retractile","neretractile","semiretractile"],0],
+      ["Râșii trăiesc:",["în haită","în grup familial","solitar (excepție femela cu pui)"],2],
+      ["Împerecherea la pisica sălbatică are loc în:",["februarie-martie","aprilie-mai","noiembrie-decembrie"],0],
+      ["Hrana de bază a pisicii sălbatice o constituie:",["fazani și iepuri","șoareci și păsări","insecte, broaște, șopârle"],1],
+      ["Pisica sălbatică are coada:",["groasă, boantă, cu inele închise","groasă cu inele albe","subțire, maroniu uniform"],0]
+    ]
+  },
+  "mamifere-mici": {
+    label:"Mamifere mici", cnt:"90",
+    q:[
+      ["Iepurele de vizuină trăiește:",["în colonii","solitar","în familii"],0],
+      ["Împerecherea vulpii are loc în perioada:",["noiembrie-decembrie","ianuarie-februarie","martie-aprilie"],1],
+      ["Gestația vulpii este de:",["4-5 săptămâni","7-8 săptămâni","10-11 săptămâni"],1],
+      ["Simțurile cele mai dezvoltate ale vulpii sunt:",["văzul și pipăitul","auzul și mirosul","mirosul și pipăitul"],1],
+      ["Hrana de bază a vulpii o constituie:",["iepurii și fazanii","fazanii și potârnichile","rozătoarele mici"],2],
+      ["Urma-pârtie a vulpii este dispusă:",["rectiliniu","ușor în zig-zag","evident în zig-zag"],0],
+      ["Longevitatea șacalului este de:",["12-14 ani","6-8 ani","20-22 ani"],0],
+      ["Care specie are talia cea mai mare?",["vulpea","șacalul","câinele enot"],1],
+      ["Biotopul preferat de câinele enot este:",["pădurile de deal","pădurile de munte","pădurile din apropierea apelor și stufărișurile"],2],
+      ["Femela de viezure fată de regulă în luna:",["februarie","martie","aprilie"],0],
+      ["Viezurele mai este cunoscut sub denumirea de:",["câine-jder","bursuc cu barbă","bursuc"],2],
+      ["Comportamentul viezurelui în timpul iernii:",["caută hrană în pădure","somnul de iarnă","caută hrană în stufărișuri"],1],
+      ["Biotopul favorabil vidrei este:",["pădurile de câmpie","apele și zonele limitrofe","pădurile de deal"],1],
+      ["Caracteristica urmei-tipar a vidrei este:",["imprimarea a patru degete","imprimarea membranei interdigitale","imprimarea pintenului"],1],
+      ["Deosebirea jder de copac / jder de piatră se face după:",["lungimea cozii","culoarea corpului","forma și culoarea petei de pe piept"],2],
+      ["Jderul de piatră se mai numește:",["câine-jder","jder de scorbură","beică"],2],
+      ["Jderii prezintă gheare retractile?",["da","nu","numai jderii de copac"],1],
+      ["Simțurile mai dezvoltate ale iepurelui de câmp sunt:",["auzul și văzul","auzul și mirosul","văzul și mirosul"],1],
+      ["Gestația la iepurele de câmp este de circa:",["42-43 zile","50-52 zile","58-60 zile"],0],
+      ["Iepuroaicele de câmp fată:",["o dată pe an","de 3-4 ori pe an","de 4-5 ori pe an"],1],
+      ["Perioada de împerechere a iepurelui de câmp:",["ianuarie–august","aprilie–mai","martie–iunie"],0],
+      ["La iepurele de câmp, când fuge, urmele posterioare se imprimă:",["în urma celor anterioare","în fața celor anterioare","suprapus"],1],
+      ["În timpul iernii, marmota:",["hibernează","este activă pe provizii","iese în zilele însorite"],0],
+      ["Marmota trăiește:",["singuratică","în perechi","în colonii"],2],
+      ["Hermelina se deosebește vara de nevăstuică prin:",["colorație roșcată","pată albă pe abdomen","vârful negru al cozii"],2],
+      ["Hârciogul trăiește de regulă în:",["câmpul agricol cultivat","tufișuri și crânguri","stufărișuri"],0],
+      ["Coada castorului este:",["turtită dorso-ventral, fără păr","turtită dorso-ventral, cu păr","turtită bilateral, cu păr"],0],
+      ["Bizamul este un animal:",["acvatic","terestru","semiacvatic"],2]
+    ]
+  },
+  "pasari": {
+    label:"Păsări", cnt:"180",
+    q:[
+      ["Păsările oaspeți de vară cuibăresc:",["în România","în țările nordice","în țările sudice"],0],
+      ["Păsările oaspeți de iarnă cuibăresc:",["în România","în țările nordice","în țările sudice"],1],
+      ["Remigele sunt penele cu care păsările:",["mențin direcția","zboară","păstrează temperatura"],1],
+      ["Rectricele sunt penele cu care păsările:",["mențin direcția","zboară","păstrează temperatura"],0],
+      ["Păsările de interes cinegetic au:",["5 degete","4 degete","3 degete"],1],
+      ["Poartă denumirea de „sarsele”:",["rața mică și rața cârâitoare","rața moțată și cea cu ciuf","rața mare și cea pestriță"],0],
+      ["La rața mare „oglinda” este:",["galbenă","albă","albastru-violetă"],2],
+      ["Rața mare este de regulă specie:",["poligamă","monogamă","rareori monogamă"],1],
+      ["Rața cârâitoare este specie:",["exclusiv sedentară","oaspete de vară","oaspete de iarnă"],1],
+      ["Rața mică este specie:",["de pasaj și oaspete de iarnă","sedentară","oaspete de vară"],0],
+      ["Rața sulițar este specie:",["sedentară","de pasaj","oaspete de vară"],1],
+      ["Care este cea mai mare gâscă sălbatică din România?",["gâsca de vară","gâsca de semănătură","gârlița mare"],0],
+      ["Gâsca de vară este specie:",["sedentară","de pasaj și oaspete de vară","oaspete de iarnă"],1],
+      ["Gârlița mare este specie:",["sedentară","de pasaj și oaspete de iarnă","oaspete de vară"],1],
+      ["Găinușa de baltă este specie:",["sedentară","sedentară și oaspete de iarnă","oaspete de vară"],2],
+      ["Becațina comună este specie:",["de pasaj","oaspete de vară","sedentară"],0],
+      ["Sitarul de pădure este specie:",["de pasaj și oaspete de vară","oaspete de iarnă","sedentară"],0],
+      ["Ciocârlia de câmp este specie:",["oaspete de vară și de pasaj","oaspete de iarnă","sedentară"],0],
+      ["Sturzul de iarnă (cocoșarul) este specie:",["de pasaj","oaspete de iarnă și sedentară","oaspete de vară"],1],
+      ["Porumbelul gulerat se mai numește:",["porumbel popesc","porumbel de scorbură","porumbel de stâncă"],0],
+      ["Turturica este specie:",["oaspete de iarnă","oaspete de vară","sedentară"],1],
+      ["Guguștiucul este specie:",["oaspete de iarnă","oaspete de vară","sedentară"],2],
+      ["Cioara grivă este specie:",["oaspete de iarnă","oaspete de vară","sedentară"],2],
+      ["Gaița este specie:",["sedentară","oaspete de iarnă","oaspete de vară"],0],
+      ["Coțofana este specie:",["sedentară","oaspete de iarnă","oaspete de vară"],0],
+      ["Lișița prezintă ca adaptare pentru înot:",["membrană interdigitală","lobi digitali","degete lungi"],1],
+      ["Ierunca este specie:",["migratoare","sedentară","eratică"],1],
+      ["Graurul este specie:",["migratoare, oaspete de vară","migratoare, oaspete de iarnă","sedentară"],0],
+      ["Stăncuța este pasăre:",["granivoră","carnivoră","omnivoră"],2],
+      ["Hrana cormoranului mare este compusă:",["din plante și melci","din cereale și pești","exclusiv din pește"],2],
+      ["Biotopul favorabil al fazanului este:",["pădurile întinse","trupuri mici de pădure cu terenuri agricole","monoculturi"],1],
+      ["Fazanul este specie:",["autohtonă","alohtonă","migratoare"],1],
+      ["Vârsta cocoșului de fazan se apreciază după:",["lungimea penelor din coadă","forma ciocului","mărimea și forma pintenilor"],2],
+      ["Fazanul este specie:",["poligamă","monogamă","rareori poligamă"],0],
+      ["Incubația la fazan durează:",["24 de zile","36 de zile","48 de zile"],0],
+      ["La fazan, clocirea o face:",["femela","femela ajutată de mascul","masculul"],0],
+      ["Biotopul favorabil potârnichii este:",["pădurile întinse","câmpii și coline cu tufișuri și culturi","monoculturi"],1],
+      ["La potârniche clocește:",["numai femela","numai masculul","ambele sexe"],0],
+      ["Potârnichea este specie:",["poligamă","monogamă","rareori poligamă"],1],
+      ["Potârnichea este o specie:",["sedentară","migratoare","oaspete de vară"],0],
+      ["Iarna, potârnichea trăiește:",["individual","în perechi","în stoluri"],2],
+      ["Prepelița este specie:",["migratoare","sedentară","eratică"],0],
+      ["Prepelița își face cuibul:",["în arbori","în scorburi","pe sol"],2],
+      ["Migrația spre Africa a prepeliței are loc preponderent în:",["iulie","septembrie","noiembrie"],1],
+      ["Prepelița mai poartă denumirea populară de:",["cocoșar","găinușă","pitpalac"],2],
+      ["Biotopul favorabil cocoșului de munte este:",["pădurile întinse de rășinoase","trupuri mici de pădure","monoculturi de munte"],0]
+    ]
+  },
+  "legislatie": {
+    label:"Legislație", cnt:"97",
+    q:[
+      ["Câte întrebări are testul de examen?",["20","30","50"],1],
+      ["Câte răspunsuri corecte sunt necesare pentru promovare?",["15","20","25"],1],
+      ["Speciile de interes cinegetic sunt prevăzute în:",["anexele nr. 1 și 2","anexa nr. 3","un ordin separat"],0],
+      ["Perioadele de vânătoare la specii sunt prevăzute în:",["anexa nr. 1","anexa nr. 2","art. 39"],0],
+      ["Speciile strict protejate sunt prevăzute în:",["anexa nr. 1","anexa nr. 2","anexa nr. 5"],1],
+      ["Permisul de vânătoare permanent este valabil:",["1 an","5 ani","pe viață"],1],
+      ["Vânătoarea în afara perioadei legale, la o specie din anexa 1, constituie:",["contravenție","faptă permisă cu aprobare","infracțiune"],2],
+      ["Cota de recoltă la căprior se aprobă anual până la data de:",["15 aprilie","15 mai","15 iunie"],0],
+      ["Cota de recoltă la celelalte specii se aprobă până la data de:",["15 aprilie","15 mai","15 iunie"],1],
+      ["Vânatul dobândit individual se crotaliază:",["la finalul sezonului","înainte de părăsirea fondului cinegetic","la predarea către gestionar"],1],
+      ["Se poate vâna pe timp de noapte cu dispozitive de ochire pe întuneric?",["da","nu","doar la mistreț"],1],
+      ["Capturarea în scop științific se poate face în perioadele interzise?",["nu","da, cu eliberarea exemplarului","doar la păsări"],1],
+      ["Vânzarea și transportul vânatului în afara perioadei legale sunt:",["permise","interzise","permise doar cu factură"],1],
+      ["La mistreț, în zonele cu pestă porcină africană, perioada de vânătoare:",["rămâne neschimbată","se extinde pe tot anul","se scurtează"],1],
+      ["Este permisă folosirea la vânătoare a alicelor cu diametrul mai mare de:",["3 mm","5 mm","7 mm"],1],
+      ["Stagiatura minimă pentru înscrierea la examen este de:",["6 luni","1 an","2 ani"],0],
+      ["Numărul maxim de păsări vânate pe zi este prevăzut la:",["lit. B din anexa nr. 1","art. 24","un ordin al ANSVSA"],0],
+      ["Cine aprobă restrângerea/extinderea perioadei de vânătoare?",["gestionarul","administratorul, prin ordin","asociația de vânătoare"],1]
+    ]
+  },
+  "etica": {
+    label:"Etică vânătorească", cnt:"38",
+    q:[
+      ["La vânătoarea de selecție, vânătorul trage:",["în orice exemplar","numai în exemplarul indicat de organizator","în primul exemplar văzut"],1],
+      ["Un „exemplar de selecție” este:",["cel mai mare exemplar","un exemplar cu defecte de creștere ce se impune recoltat","femela cu pui"],1],
+      ["La urs, cerb și capră neagră se folosesc:",["arme cu țeavă lisă","arme cu țevi ghintuite și cartușe cu glonț","orice armă"],1],
+      ["Comportamentul etic față de vânatul rănit impune:",["abandonarea lui","urmărirea și împușcarea rapidă pentru a nu suferi","lăsarea pentru a doua zi"],1],
+      ["Gonașii la vânătoarea colectivă trebuie să:",["stea nemișcați","facă permanent zgomot pentru a fi identificați","se apropie de vânatul rănit"],1],
+      ["Este etic să se depășească cota de recoltă aprobată?",["da, dacă e vânat mult","nu","doar la dăunători"],1],
+      ["Furnizarea de informații eronate despre efective de către gestionar este:",["permisă","interzisă","recomandată"],1],
+      ["Numărul de piese aprobat pe vânător/zi:",["poate fi depășit","nu poate fi depășit","nu există"],1],
+      ["Respectul față de vânatul împușcat presupune:",["fotografii oricum","respectarea obiceiurilor de după focul de armă","niciun ritual"],1]
+    ]
+  },
+  "chinologie": {
+    label:"Chinologie", cnt:"33",
+    q:[
+      ["La vânătoarea de vânat mic (iepure, fazan) se folosesc de regulă câini:",["de aport și scotocitori","de urmă la mistreț","de blocaj"],0],
+      ["Câinele de vânătoare este definit ca:",["orice câine liber în teren","câine utilitar reglementat, folosit exclusiv de vânători","câine hoinar"],1],
+      ["Un câine „hoinar” este:",["câine de vânătoare autorizat","câine liber, fără stăpân identificabil, fără semn distinct","câine de pază"],1],
+      ["Aportul reprezintă:",["urmărirea vânatului rănit","aducerea vânatului împușcat la vânător","dresajul de bază"],1],
+      ["La vânătoarea de mistreț se folosesc frecvent câini:",["de aret","gonitori și de urmă (limieri)","de vizuină exclusiv"],1],
+      ["Rasele de câini admise la vânătoare sunt stabilite prin:",["ordin al ministrului","hotărârea vânătorilor","niciun act"],0]
+    ]
+  },
+  "boli": {
+    label:"Boli ale vânatului", cnt:"21",
+    q:[
+      ["Ce se înțelege prin zoonoză?",["boală transmisibilă de la animale la om și invers","totalitatea animalelor dintr-un ecosistem","un lanț trofic"],0],
+      ["Cea mai periculoasă boală transmisă prin paraziți de la cervide la om este:",["gălbeaza","borelioza","hipodermoza"],1],
+      ["Carnea de mistreț se poate împărți vânătorilor:",["fără restricții","după plata contravalorii","după efectuarea analizelor sanitar-veterinare"],2],
+      ["În caz de carantină pe un fond cinegetic din cauza unei epizootii, vânătoarea la goană:",["se poate desfășura liber","nu se poate desfășura","doar pentru vulpe"],1],
+      ["Pesta porcină africană afectează:",["iepurele","mistrețul și porcul domestic","cervidele"],1],
+      ["Turbarea (rabia) este o boală care:",["nu se transmite la om","se transmite la om și e mortală","afectează doar păsările"],1]
+    ]
+  },
+  "arme": {
+    label:"Arme și muniție", cnt:"43",
+    q:[
+      ["Pentru urs, cerb comun, cerb lopătar și capra neagră se folosesc:",["arme cu țevi lise","arme cu țevi ghintuite","orice armă"],1],
+      ["La mistreț, căprior și muflon se pot folosi și arme cu țeavă lisă, dar numai cu:",["alice mărunte","muniție cu proiectil unic","cartușe cu bile de cauciuc"],1],
+      ["Este interzisă folosirea alicelor cu diametrul mai mare de:",["3 mm","5 mm","7 mm"],1],
+      ["Pentru iepure, fazan, rațe se folosesc de regulă arme cu:",["țevi ghintuite","țevi lise și alice","glonț"],1],
+      ["Percuția cartușului pe ramă (armă lefaucheux) la vânătoare este:",["permisă","interzisă","permisă doar la păsări"],1],
+      ["Arma trebuie ținută la vânătoare:",["oricum","în mână","pe umăr cu piedica pusă mereu"],1],
+      ["Bătaia eficace a alicelor la o pușcă de vânătoare este de aproximativ:",["10-15 m","30-40 m","100 m"],1]
+    ]
+  }
+};
+
+/* ============ PERIODE (pentru tabel) ============ */
+const MAM = [
+  ["Căprior – mascul","1 mai","15 octombrie","T2–T4"],
+  ["Mistreț","1 august","31 ianuarie","T3–T1"],
+  ["Viezure","1 august","31 martie","T3–T1"],
+  ["Bizam","1 septembrie","15 aprilie","T3–T2"],
+  ["Capră neagră – selecție","1 septembrie","15 decembrie","T3–T4"],
+  ["Capră neagră – trofeu","15 octombrie","15 decembrie","T4"],
+  ["Căprior – femelă","1 septembrie","15 februarie","T3–T1"],
+  ["Cerb comun – femelă/vițel/selecție","1 septembrie","15 februarie","T3–T1"],
+  ["Cerb comun – mascul trofeu","10 septembrie","15 noiembrie","T3–T4"],
+  ["Cerb lopătar – femelă/vițel","1 septembrie","15 februarie","T3–T1"],
+  ["Cerb lopătar – mascul trofeu","10 octombrie","15 decembrie","T4"],
+  ["Câine enot / dihor / hermelină / jder / nevăstuică","15 septembrie","31 martie","T3–T1"],
+  ["Marmotă","15 septembrie","31 octombrie","T3–T4"],
+  ["Muflon","15 septembrie","15 decembrie","T3–T4"],
+  ["Iepure-de-câmp / de-vizuină","1 noiembrie","31 ianuarie","T4–T1"],
+  ["Șacal / vulpe","tot anul","tot anul","T1–T4"]
+];
+const PAS = [
+  ["Cioară grivă / coțofană","1 iunie","31 martie","T2–T1"],
+  ["Stăncuță","10 iulie","20 martie","T3–T1"],
+  ["Cioară-de-semănătură / rață sulițar","15 august","31 ianuarie","T3–T1"],
+  ["Gâscă-de-vară + rațe (grup)","15 august","15 februarie","T3–T1"],
+  ["Graur / guguștiuc","15 august","28 februarie","T3–T1"],
+  ["Prepeliță","15 august","31 octombrie","T3–T4"],
+  ["Turturică","15 august","30 septembrie","T3"],
+  ["Becațină / cocoșar / gaiță / sitar / sturzi","1 septembrie","28 februarie","T3–T1"],
+  ["Rață mare","1 septembrie","15 februarie","T3–T1"],
+  ["Lișiță / porumbei / rață mică","1 septembrie","10 februarie","T3–T1"],
+  ["Ciocârlie-de-câmp","15 septembrie","31 octombrie","T3–T4"],
+  ["Ieruncă","15 septembrie","15 decembrie","T3–T4"],
+  ["Potârniche","15 septembrie","31 decembrie","T3–T4"],
+  ["Fazan","1 octombrie","28 februarie","T4–T1"],
+  ["Gârliță mare","15 octombrie","15 februarie","T4–T1"]
+];
+
+/* ============ FIȘE RAPIDE ============ */
+const FACTS = [
+  ["Deschiderea sezonului",["<b>Căprior mascul</b> — 1 mai (primul vânat mare)","<b>Mistreț & viezure</b> — 1 august","<b>Cervide, capra neagră</b> — 1 septembrie","<b>Fazan</b> — 1 octombrie · <b>Iepure</b> — 1 noiembrie"]],
+  ["Gestații de reținut",["<b>Cerb comun</b> — 34 săptămâni","<b>Mistreț</b> — 16-17 săptămâni (115-120 zile)","<b>Urs</b> — 7-8 luni","<b>Iepure de câmp</b> — 42-43 zile · <b>Vulpe</b> — 7-8 săpt."]],
+  ["Împerecherea (rutul)",["<b>Cerb comun</b> — septembrie-octombrie (boncănit)","<b>Căprior</b> — iulie-august","<b>Capra neagră / muflon</b> — octombrie-noiembrie","<b>Urs</b> — mai-iunie · <b>Vulpe</b> — ianuarie-februarie"]],
+  ["Denumiri ale rutului",["<b>Boncănit</b> — cerb comun","<b>Alergat</b> — căprior","<b>Brăhnit</b> — glasul țapului de căprior","<b>Pitpalac</b> — prepelița"]],
+  ["Coarne — cresc toată viața",["<b>Capra neagră</b> — pe cepi osoși","<b>Muflonul</b> — pe cepi osoși","La cervide coarnele <b>cad și cresc anual</b>","Cornul de căprior normal are <b>3 ramuri</b>"]],
+  ["Simțuri dominante",["<b>Mistreț / urs / lup</b> — miros și auz","<b>Cerb, iepure</b> — auz și miros","<b>Cel mai slab la mistreț și urs</b> — văzul","<b>Râs</b> — auz, văz și miros"]],
+  ["Specii introduse / speciale",["<b>Fazanul</b> — specie alohtonă (introdusă)","<b>Șacal & vulpe</b> — se vânează tot anul","<b>Bizam</b> — semiacvatic","<b>Iepure de vizuină</b> — trăiește în colonii"]],
+  ["Examen — cifrele-cheie",["<b>30</b> întrebări în test","<b>20</b> corecte = promovat","Permis valabil <b>5 ani</b>","Stagiatură minimă <b>6 luni</b>"]],
+  ["Anexe & legislație",["<b>Anexa 1</b> — specii vânabile + perioade","<b>Anexa 2</b> — specii strict protejate","Vânatul se <b>crotaliază</b> înainte de a părăsi fondul","Cota la <b>căprior</b> — până la 15 aprilie"]]
+];
+
+/* ============ TABS ============ */
+const TABS=[["v-flash","Flashcards"],["v-quiz","Test-grilă"],["v-facts","Fișe rapide"],["v-per","Perioade"]];
+const tabsEl=document.getElementById('tabs');
+TABS.forEach((t,i)=>{const b=document.createElement('button');b.className='tab'+(i===0?' active':'');
+  b.textContent=t[1];b.onclick=()=>showView(t[0],b);tabsEl.appendChild(b);});
+function showView(id,btn){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');
+  window.scrollTo({top:document.querySelector('nav.tabs').offsetTop-1,behavior:'smooth'});}
+
+/* ============ FLASHCARDS ============ */
+let fcChap="mamifere-mari", fcList=[], fcIdx=0, fcFlipped=false;
+const fcChips=document.getElementById('fc-chips');
+Object.keys(DATA).forEach((k,i)=>{const c=document.createElement('button');
+  c.className='chip'+(i===0?' on':'');c.innerHTML=DATA[k].label+' <span class="cnt">'+DATA[k].cnt+'</span>';
+  c.onclick=()=>{document.querySelectorAll('#fc-chips .chip').forEach(x=>x.classList.remove('on'));
+    c.classList.add('on');loadFC(k);};fcChips.appendChild(c);});
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+function loadFC(k){fcChap=k;fcList=shuffle(DATA[k].q);fcIdx=0;fcFlipped=false;renderFC();}
+function renderFC(){
+  const q=fcList[fcIdx];const fc=document.getElementById('fc');fc.classList.remove('flip');fcFlipped=false;
+  document.getElementById('fc-tag').textContent=DATA[fcChap].label+" · "+(fcIdx+1);
+  document.getElementById('fc-q').textContent=q[0];
+  const o=document.getElementById('fc-opts');o.innerHTML='';
+  q[1].forEach((op,i)=>{const d=document.createElement('div');d.className='opt';
+    d.textContent=String.fromCharCode(97+i)+') '+op;o.appendChild(d);});
+  document.getElementById('fc-a').textContent=q[1][q[2]];
+  document.getElementById('fc-count').textContent=(fcIdx+1)+' / '+fcList.length;
+  document.getElementById('fc-bar').style.width=((fcIdx+1)/fcList.length*100)+'%';
+  document.getElementById('fc-prev').disabled=fcIdx===0;
+}
+function flip(){fcFlipped=!fcFlipped;document.getElementById('fc').classList.toggle('flip',fcFlipped);}
+function fcNext(){if(fcIdx<fcList.length-1){fcIdx++;renderFC();}else{fcList=shuffle(fcList);fcIdx=0;renderFC();}}
+function fcPrev(){if(fcIdx>0){fcIdx--;renderFC();}}
+function mark(known){
+  if(!known){fcList.push(fcList[fcIdx]);}
+  fcNext();
+}
+loadFC("mamifere-mari");
+
+/* ============ QUIZ ============ */
+let qzChap="mamifere-mari", qzSet=[], qzIdx=0, qzScore=0, qzAnswered=false;
+const qzChips=document.getElementById('qz-chips');
+Object.keys(DATA).forEach((k,i)=>{const c=document.createElement('button');
+  c.className='chip'+(i===0?' on':'');c.innerHTML=DATA[k].label+' <span class="cnt">10</span>';
+  c.onclick=()=>{document.querySelectorAll('#qz-chips .chip').forEach(x=>x.classList.remove('on'));
+    c.classList.add('on');startQuiz(k);};qzChips.appendChild(c);});
+function startQuiz(k){qzChap=k;qzSet=shuffle(DATA[k].q).slice(0,Math.min(10,DATA[k].q.length));
+  qzIdx=0;qzScore=0;renderQuiz();}
+function renderQuiz(){
+  const card=document.getElementById('quiz-card');qzAnswered=false;
+  const q=qzSet[qzIdx];
+  let html='<div style="display:flex;justify-content:space-between;align-items:center">'+
+    '<div class="q-tag" style="font-family:\'SF Mono\',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)">'+
+    DATA[qzChap].label+'</div><div class="score">Întrebarea <b>'+(qzIdx+1)+'</b> / '+qzSet.length+'</div></div>';
+  html+='<div class="quiz-q">'+q[0]+'</div>';
+  q[1].forEach((op,i)=>{html+='<button class="qopt" data-i="'+i+'" onclick="answer('+i+')">'+
+    '<span class="k">'+String.fromCharCode(97+i)+'</span><span>'+op+'</span></button>';});
+  html+='<div class="quiz-next"><div class="score">Scor: <b>'+qzScore+'</b> / '+qzSet.length+'</div>'+
+    '<button class="btn primary" id="qz-next" onclick="quizNext()" style="visibility:hidden">Continuă →</button></div>';
+  card.innerHTML=html;
+}
+function answer(i){
+  if(qzAnswered)return;qzAnswered=true;
+  const q=qzSet[qzIdx];const correct=q[2];
+  document.querySelectorAll('#quiz-card .qopt').forEach(b=>{b.disabled=true;
+    const bi=+b.dataset.i;if(bi===correct)b.classList.add('right');
+    else if(bi===i)b.classList.add('wrong');});
+  if(i===correct)qzScore++;
+  document.querySelector('#quiz-card .score b').textContent=qzScore;
+  document.getElementById('qz-next').style.visibility='visible';
+}
+function quizNext(){
+  if(qzIdx<qzSet.length-1){qzIdx++;renderQuiz();}
+  else{
+    const pct=Math.round(qzScore/qzSet.length*100);
+    const pass=qzScore>=Math.ceil(qzSet.length*0.66);
+    document.getElementById('quiz-card').innerHTML=
+      '<div class="result"><div class="big">'+qzScore+'/'+qzSet.length+'</div>'+
+      '<div class="verdict '+(pass?'pass':'fail')+'">'+(pass?'Bravo! Ai trecut pragul.':'Mai exersează — aproape!')+'</div>'+
+      '<p style="color:var(--ink-dim);margin:10px 0 22px">'+pct+'% răspunsuri corecte la capitolul '+DATA[qzChap].label+'.</p>'+
+      '<button class="btn primary" onclick="startQuiz(\''+qzChap+'\')">Reia testul ↻</button></div>';
+  }
+}
+startQuiz("mamifere-mari");
+
+/* ============ FIȘE ============ */
+const factsEl=document.getElementById('facts');
+FACTS.forEach(f=>{const d=document.createElement('div');d.className='fact';
+  d.innerHTML='<h4>'+f[0]+'</h4><ul>'+f[1].map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+  factsEl.appendChild(d);});
+
+/* ============ TABELE ============ */
+function buildTable(el,rows){
+  let h='<thead><tr><th>Specie</th><th>Începe</th><th>Se închide</th><th>Trim.</th></tr></thead><tbody>';
+  rows.forEach(r=>{h+='<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td><span class="badge">'+r[3]+'</span></td></tr>';});
+  h+='</tbody>';el.innerHTML=h;
+}
+buildTable(document.getElementById('tbl-mam'),MAM);
+buildTable(document.getElementById('tbl-pas'),PAS);
+
+/* keyboard */
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('v-flash').classList.contains('active')){
+    if(e.key==='ArrowRight')fcNext();
+    if(e.key==='ArrowLeft')fcPrev();
+    if(e.key===' '){e.preventDefault();flip();}
+  }
+});
+</script>
+</body>
+</html>
