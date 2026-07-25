@@ -200,10 +200,39 @@
   footer a{color:var(--moss)}
   .disc{background:rgba(200,98,58,.08);border:1px solid rgba(200,98,58,.3);border-radius:12px;
     padding:14px 16px;font-family:system-ui,sans-serif;font-size:13px;color:var(--ink-dim);margin-top:20px}
+  /* ---------- ISTORIC & GREȘELI ---------- */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:12px;margin-bottom:22px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden}
+  .stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
+  .stat .v{font-size:28px;color:var(--gold-soft);font-weight:600;line-height:1}
+  .stat .k{font-family:"SF Mono",monospace;font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--ink-dim);margin-top:6px}
+  .chart-card{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);
+    border-radius:18px;padding:22px 20px 16px;margin-bottom:22px;box-shadow:var(--shadow)}
+  .chart-card .ct{font-family:"SF Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--gold);margin-bottom:14px}
+  .hist-list{display:flex;flex-direction:column;gap:8px}
+  .hist-row{display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:12px 16px;font-family:system-ui,sans-serif}
+  .hist-row .hnum{font-family:"SF Mono",monospace;font-size:11px;color:var(--gold);min-width:30px}
+  .hist-row .hd{color:var(--ink-dim);font-size:13px}
+  .hist-row .hs{font-weight:700;color:var(--ink);font-size:17px;margin-left:auto}
+  .hist-row .hs small{color:var(--ink-dim);font-size:12px;font-weight:400}
+  .hist-row .hb{font-family:"SF Mono",monospace;font-size:11px;padding:3px 10px;border-radius:7px;min-width:74px;text-align:center}
+  .hb.pass{background:rgba(127,174,85,.16);color:var(--moss)}
+  .hb.fail{background:rgba(200,98,58,.16);color:var(--rust)}
+  .empty{text-align:center;padding:54px 20px;color:var(--ink-dim);font-family:system-ui,sans-serif;
+    font-size:15px;line-height:1.6;border:1px dashed var(--line);border-radius:18px}
+  .empty .big{font-size:44px;margin-bottom:14px;opacity:.55}
+  .miss-chaps{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin:16px 0 4px}
+  .miss-chip{font-family:"SF Mono",monospace;font-size:11px;color:var(--ink-dim);background:var(--panel);
+    border:1px solid var(--line);border-radius:8px;padding:4px 10px}
+  .miss-chip b{color:var(--gold-soft)}
   @media (max-width:640px){
     .hero{padding:46px 0 30px}
     .fc .q{font-size:19px}
     .face{padding:24px}
+    .hist-row .hd{display:none}
   }
 </style>
 </head>
@@ -310,6 +339,24 @@
     <h3 style="font-size:18px;color:var(--gold-soft);margin:28px 0 12px">Păsări</h3>
     <div class="tbl-wrap"><table id="tbl-pas"></table></div>
     <div class="disc"><b>Atenție:</b> perioadele pot fi restrânse sau extinse prin ordin al administratorului (art. 26 alin. 2). Speciile din Anexa nr. 2 (urs, lup, râs, pisică sălbatică, zimbru) sunt strict protejate — doar prin derogare.</div>
+  </div>
+</section>
+
+<!-- ISTORIC -->
+<section class="view" id="v-hist">
+  <div class="wrap">
+    <div class="sec-head"><h2>Istoricul examenelor</h2><span class="tag">evoluția ta</span></div>
+    <p class="sec-sub">Fiecare simulare de examen (pe 30 de întrebări) se salvează automat pe acest dispozitiv. Urmărește-ți evoluția în timp — linia punctată marchează pragul de promovare (20 din 30).</p>
+    <div id="hist-box"></div>
+  </div>
+</section>
+
+<!-- GREȘELI -->
+<section class="view" id="v-miss">
+  <div class="wrap">
+    <div class="sec-head"><h2>Greșelile mele</h2><span class="tag">chestionar personalizat</span></div>
+    <p class="sec-sub">Un chestionar construit automat din toate întrebările la care ai greșit — la examen, la test-grilă sau la flashcards. Când răspunzi corect la o întrebare, ea iese din listă. Așa exersezi exact ce nu știi încă.</p>
+    <div id="miss-box"></div>
   </div>
 </section>
 
@@ -1379,13 +1426,15 @@ const FACTS = [
 ];
 
 /* ============ TABS ============ */
-const TABS=[["v-exam","Examen 30"],["v-flash","Flashcards"],["v-quiz","Test-grilă"],["v-facts","Fișe rapide"],["v-per","Perioade"]];
+const TABS=[["v-exam","Examen 30"],["v-hist","Istoric"],["v-miss","Greșeli"],["v-flash","Flashcards"],["v-quiz","Test-grilă"],["v-facts","Fișe rapide"],["v-per","Perioade"]];
 const tabsEl=document.getElementById('tabs');
 TABS.forEach((t,i)=>{const b=document.createElement('button');b.className='tab'+(i===0?' active':'');
   b.textContent=t[1];b.onclick=()=>showView(t[0],b);tabsEl.appendChild(b);});
 function showView(id,btn){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');
+  if(id==='v-hist')renderHist();
+  if(id==='v-miss')renderMissHome();
   window.scrollTo({top:document.querySelector('nav.tabs').offsetTop-1,behavior:'smooth'});}
 
 /* ============ FLASHCARDS ============ */
@@ -1413,7 +1462,9 @@ function flip(){fcFlipped=!fcFlipped;document.getElementById('fc').classList.tog
 function fcNext(){if(fcIdx<fcList.length-1){fcIdx++;renderFC();}else{fcList=shuffle(fcList);fcIdx=0;renderFC();}}
 function fcPrev(){if(fcIdx>0){fcIdx--;renderFC();}}
 function mark(known){
-  if(!known){fcList.push(fcList[fcIdx]);}
+  const q=fcList[fcIdx];
+  if(!known){fcList.push(q);recordMiss(fcChap,q[0]);}
+  else{clearMiss(fcChap,q[0]);}
   fcNext();
 }
 loadFC("mamifere-mari");
@@ -1446,7 +1497,8 @@ function answer(i){
   document.querySelectorAll('#quiz-card .qopt').forEach(b=>{b.disabled=true;
     const bi=+b.dataset.i;if(bi===correct)b.classList.add('right');
     else if(bi===i)b.classList.add('wrong');});
-  if(i===correct)qzScore++;
+  if(i===correct){qzScore++;clearMiss(qzChap,q[0]);}
+  else{recordMiss(qzChap,q[0]);}
   document.querySelector('#quiz-card .score b').textContent=qzScore;
   document.getElementById('qz-next').style.visibility='visible';
 }
@@ -1531,11 +1583,12 @@ function examFinish(){
   if(exDone)return;exDone=true;clearInterval(exTimer);
   let sc=0;
   exSet.forEach((it,i)=>{
-    const c=it[1][2];
+    const chap=it[0],qtext=it[1][0],c=it[1][2];
     document.getElementById('e'+i+'_'+c).classList.add('ok');
-    if(exAns[i]===c)sc++;
-    else if(exAns[i]!==null)document.getElementById('e'+i+'_'+exAns[i]).classList.add('ko');
+    if(exAns[i]===c){sc++;clearMiss(chap,qtext);}
+    else if(exAns[i]!==null){document.getElementById('e'+i+'_'+exAns[i]).classList.add('ko');recordMiss(chap,qtext);}
   });
+  recordExam(sc);
   const pass=sc>=20;
   const bar=document.querySelector('#exam-box .ex-bar');
   if(bar)bar.remove();
@@ -1552,6 +1605,113 @@ function examFinish(){
   window.scrollTo({top:document.getElementById('v-exam').offsetTop,behavior:'smooth'});
 }
 examIntro();
+
+/* ============ SALVARE LOCALĂ: ISTORIC + GREȘELI ============ */
+const LS={
+  get(k,def){try{const v=localStorage.getItem(k);return v==null?def:JSON.parse(v);}catch(e){return def;}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+};
+function missKey(c,q){return c+'||'+q;}
+function recordMiss(c,q){const m=LS.get('vmiss',{});const k=missKey(c,q);
+  if(!m[k])m[k]={c:c,q:q,n:0};m[k].n++;LS.set('vmiss',m);}
+function clearMiss(c,q){const m=LS.get('vmiss',{});delete m[missKey(c,q)];LS.set('vmiss',m);}
+function getMissList(){const m=LS.get('vmiss',{});const out=[];
+  Object.keys(m).forEach(k=>{const r=m[k];const d=DATA[r.c];if(!d)return;
+    const item=d.q.find(x=>x[0]===r.q);if(item)out.push({c:r.c,item:item,n:r.n});});
+  return out;}
+function recordExam(score){const h=LS.get('vhist',[]);h.push({d:Date.now(),s:score,t:30});
+  if(h.length>300)h.shift();LS.set('vhist',h);}
+
+/* ---------- ISTORIC ---------- */
+function stat(v,k){return '<div class="stat"><div class="v">'+v+'</div><div class="k">'+k+'</div></div>';}
+function fmtDate(ts){const d=new Date(ts);
+  return d.toLocaleDateString('ro-RO',{day:'2-digit',month:'short',year:'numeric'})+' · '+
+    d.toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});}
+function chartSVG(scores){
+  const w=640,h=240,pl=32,pr=16,pt=16,pb=24,iw=w-pl-pr,ih=h-pt-pb,maxV=30,n=scores.length;
+  const x=i=>n===1?pl+iw/2:pl+iw*i/(n-1);
+  const y=v=>pt+ih*(1-v/maxV);
+  let g='';
+  [0,10,20,30].forEach(v=>{const yy=y(v);
+    g+='<line x1="'+pl+'" y1="'+yy+'" x2="'+(w-pr)+'" y2="'+yy+'" stroke="'+(v===20?'#7fae55':'#38492a')+
+       '" stroke-width="1"'+(v===20?' stroke-dasharray="5 5"':'')+'/>';
+    g+='<text x="'+(pl-7)+'" y="'+(yy+4)+'" fill="#a9b79a" font-size="11" font-family="monospace" text-anchor="end">'+v+'</text>';});
+  g+='<text x="'+(w-pr)+'" y="'+(y(20)-6)+'" fill="#7fae55" font-size="10" font-family="monospace" text-anchor="end">prag 20</text>';
+  if(n>1){const pts=scores.map((v,i)=>x(i)+','+y(v)).join(' ');
+    g+='<polyline points="'+pts+'" fill="none" stroke="#d6a94e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';}
+  scores.forEach((v,i)=>{const col=v>=20?'#7fae55':'#c8623a';
+    g+='<circle cx="'+x(i)+'" cy="'+y(v)+'" r="'+(n>40?2.5:4.5)+'" fill="'+col+'" stroke="#12180f" stroke-width="1.5"/>';});
+  return '<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:auto;display:block" preserveAspectRatio="xMidYMid meet">'+g+'</svg>';
+}
+function renderHist(){
+  const h=LS.get('vhist',[]),box=document.getElementById('hist-box');
+  if(!h.length){box.innerHTML='<div class="empty"><div class="big">📊</div>'+
+    'Niciun examen salvat încă.<br>Dă o simulare la <b>Examen 30</b> — rezultatul va apărea aici și îți vei putea urmări evoluția.</div>';return;}
+  const scores=h.map(x=>x.s),best=Math.max.apply(null,scores),
+    avg=scores.reduce((a,b)=>a+b,0)/scores.length,passes=h.filter(x=>x.s>=20).length;
+  let html='<div class="stat-grid">'+stat(h.length,'examene date')+stat(best+'/30','cel mai bun')+
+    stat(avg.toFixed(1),'media')+stat(passes,'promovate')+'</div>';
+  html+='<div class="chart-card"><div class="ct">Evoluția scorului · '+h.length+' '+(h.length===1?'examen':'examene')+'</div>'+chartSVG(scores)+'</div>';
+  html+='<div class="hist-list">';
+  h.slice().reverse().forEach((x,i)=>{const num=h.length-i,pass=x.s>=20;
+    html+='<div class="hist-row"><span class="hnum">#'+num+'</span><span class="hd">'+fmtDate(x.d)+'</span>'+
+      '<span class="hs">'+x.s+'<small>/30</small></span>'+
+      '<span class="hb '+(pass?'pass':'fail')+'">'+(pass?'ADMIS':'RESPINS')+'</span></div>';});
+  html+='</div><div style="margin-top:18px"><button class="btn" onclick="clearHist()">Șterge istoricul</button></div>';
+  box.innerHTML=html;
+}
+function clearHist(){if(confirm('Ștergi tot istoricul examenelor?')){LS.set('vhist',[]);renderHist();}}
+
+/* ---------- GREȘELI (chestionar personalizat) ---------- */
+let msSet=[],msIdx=0,msAnswered=false,msRight=0;
+function renderMissHome(){
+  const list=getMissList(),box=document.getElementById('miss-box');
+  if(!list.length){box.innerHTML='<div class="empty"><div class="big">✓</div>'+
+    'Nicio greșeală salvată deocamdată.<br>Dă un <b>examen</b> sau un <b>test-grilă</b> — întrebările greșite apar aici automat, ca să le poți exersa.</div>';return;}
+  const byChap={};list.forEach(r=>{byChap[r.c]=(byChap[r.c]||0)+1;});
+  let chips='';Object.keys(byChap).forEach(c=>{chips+='<span class="miss-chip">'+DATA[c].label+' <b>'+byChap[c]+'</b></span>';});
+  box.innerHTML='<div class="ex-start"><h3>'+list.length+' '+(list.length===1?'întrebare de recuperat':'întrebări de recuperat')+'</h3>'+
+    '<p>Ai greșit aceste întrebări cel puțin o dată. Exersează-le până le stăpânești — fiecare răspuns corect o scoate din listă.</p>'+
+    '<div class="miss-chaps">'+chips+'</div>'+
+    '<div style="margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'+
+    '<button class="btn primary" onclick="startMiss()">Începe recuperarea</button>'+
+    '<button class="btn" onclick="clearAllMiss()">Șterge lista</button></div></div>';
+}
+function startMiss(){msSet=shuffle(getMissList());msIdx=0;msRight=0;renderMiss();}
+function renderMiss(){
+  const box=document.getElementById('miss-box');msAnswered=false;
+  if(msIdx>=msSet.length){renderMissDone();return;}
+  const rec=msSet[msIdx],q=rec.item;
+  let h='<div class="quiz-card"><div style="display:flex;justify-content:space-between;align-items:center">'+
+    '<div style="font-family:\'SF Mono\',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)">'+
+    DATA[rec.c].label+'</div><div class="score">Întrebarea <b>'+(msIdx+1)+'</b> / '+msSet.length+'</div></div>';
+  h+='<div class="quiz-q">'+q[0]+'</div>';
+  q[1].forEach((op,i)=>{h+='<button class="qopt" data-i="'+i+'" onclick="missAnswer('+i+')">'+
+    '<span class="k">'+String.fromCharCode(97+i)+'</span><span>'+op+'</span></button>';});
+  h+='<div class="quiz-next"><div class="score">Rămase în listă: <b id="ms-left">'+getMissList().length+'</b></div>'+
+    '<button class="btn primary" id="ms-next" onclick="missNext()" style="visibility:hidden">Continuă →</button></div></div>';
+  box.innerHTML=h;
+}
+function missAnswer(i){
+  if(msAnswered)return;msAnswered=true;
+  const rec=msSet[msIdx],q=rec.item,correct=q[2];
+  document.querySelectorAll('#miss-box .qopt').forEach(b=>{b.disabled=true;const bi=+b.dataset.i;
+    if(bi===correct)b.classList.add('right');else if(bi===i)b.classList.add('wrong');});
+  if(i===correct){msRight++;clearMiss(rec.c,q[0]);}else{recordMiss(rec.c,q[0]);}
+  document.getElementById('ms-left').textContent=getMissList().length;
+  document.getElementById('ms-next').style.visibility='visible';
+}
+function missNext(){msIdx++;renderMiss();}
+function renderMissDone(){
+  const remaining=getMissList().length;
+  document.getElementById('miss-box').innerHTML='<div class="ex-res">'+
+    '<div style="font-size:48px;color:var(--gold-soft);font-weight:600">'+msRight+' / '+msSet.length+'</div>'+
+    '<div style="font-size:19px;margin-top:6px">corecte în această rundă</div>'+
+    '<p style="color:var(--ink-dim);font-family:system-ui,sans-serif;font-size:14px;margin:12px 0 20px">'+
+    (remaining?'Au mai rămas <b style="color:var(--gold-soft)">'+remaining+'</b> întrebări de recuperat.':'Felicitări! Ai golit lista de greșeli. 🎉')+'</p>'+
+    '<button class="btn primary" onclick="renderMissHome()">Înapoi la listă</button></div>';
+}
+function clearAllMiss(){if(confirm('Ștergi toată lista de greșeli?')){LS.set('vmiss',{});renderMissHome();}}
 
 /* keyboard */
 document.addEventListener('keydown',e=>{
