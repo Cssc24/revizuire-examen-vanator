@@ -234,31 +234,345 @@
     .face{padding:24px}
     .hist-row .hd{display:none}
   }
+
+  /* ============================================================
+     SAAS SHELL — écrans, landing, auth, barre de compte
+     ============================================================ */
+  .screen{display:none}
+  .screen.show{display:block;animation:fade .4s ease}
+
+  /* ---------- BARRE DE COMPTE (app) ---------- */
+  .topbar{position:sticky;top:0;z-index:40;background:rgba(18,24,15,.9);
+    backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .topbar-inner{max-width:1000px;margin:0 auto;padding:12px 20px;display:flex;
+    align-items:center;gap:14px}
+  .brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
+  .brand .mk{width:34px;height:34px;flex:0 0 auto}
+  .brand .bt{display:flex;flex-direction:column;line-height:1.1}
+  .brand .bt b{font-size:15px;font-weight:600;letter-spacing:-.01em}
+  .brand .bt span{font-family:"SF Mono",ui-monospace,monospace;font-size:9.5px;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+  .topbar .spacer{flex:1}
+  .acct{display:flex;align-items:center;gap:12px}
+  .acct .who{font-family:system-ui,sans-serif;font-size:12.5px;color:var(--ink-dim);
+    max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .acct .who b{color:var(--ink);font-weight:600}
+  .btn.ghost{background:transparent;padding:8px 14px;font-size:13px}
+  .plan-pill{font-family:"SF Mono",monospace;font-size:10px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--moss);background:rgba(127,174,85,.14);
+    border:1px solid rgba(127,174,85,.3);border-radius:99px;padding:4px 10px}
+  @media (max-width:640px){.acct .who{display:none}}
+
+  /* ---------- LANDING ---------- */
+  .lp-hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+  .lp-hero .antlers{position:absolute;inset:0;opacity:.13;pointer-events:none}
+  .lp-nav{max-width:1080px;margin:0 auto;padding:20px;display:flex;align-items:center;gap:14px;
+    position:relative;z-index:2}
+  .lp-nav .spacer{flex:1}
+  .lp-hero .inner{max-width:1080px;margin:0 auto;padding:36px 20px 70px;position:relative;z-index:2}
+  .lp-badge{display:inline-flex;align-items:center;gap:8px;font-family:"SF Mono",monospace;
+    font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
+    background:rgba(214,169,78,.1);border:1px solid rgba(214,169,78,.28);
+    border-radius:99px;padding:6px 14px;margin-bottom:26px}
+  .lp-badge .dot{width:6px;height:6px;border-radius:99px;background:var(--moss);
+    box-shadow:0 0 0 3px rgba(127,174,85,.25)}
+  .lp-hero h1{font-size:clamp(40px,7.2vw,74px);line-height:1.02;max-width:16ch}
+  .lp-hero h1 em{font-style:italic;color:var(--gold-soft)}
+  .lp-hero .lead{max-width:56ch;color:var(--ink-dim);font-size:19px;margin:22px 0 0;line-height:1.5}
+  .lp-cta{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:34px}
+  .btn.lg{padding:15px 28px;font-size:15.5px;border-radius:13px}
+  .btn.hero-primary{background:linear-gradient(160deg,var(--gold-soft),var(--gold));
+    border-color:var(--gold);color:var(--bg);box-shadow:0 12px 30px rgba(214,169,78,.28)}
+  .btn.hero-primary:hover{filter:brightness(1.06);color:var(--bg)}
+  .lp-cta .note{font-family:system-ui,sans-serif;font-size:13px;color:var(--ink-dim)}
+  .lp-cta .note b{color:var(--moss)}
+
+  .lp-strip{display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--line);border-radius:var(--r);
+    margin:44px 0 0;overflow:hidden;background:rgba(255,255,255,.02)}
+  .lp-strip .cell{flex:1 1 130px;padding:18px 20px;border-right:1px solid var(--line)}
+  .lp-strip .cell:last-child{border-right:none}
+  .lp-strip .n{font-size:30px;color:var(--gold-soft);font-weight:600}
+  .lp-strip .l{font-family:"SF Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-dim);margin-top:5px}
+
+  .lp-sec{max-width:1080px;margin:0 auto;padding:78px 20px}
+  .lp-sec.tight{padding-top:20px}
+  .lp-eyebrow{font-family:"SF Mono",monospace;font-size:11.5px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--gold);text-align:center}
+  .lp-sec h2{font-size:clamp(28px,4.6vw,40px);text-align:center;margin:14px auto 0;max-width:20ch;line-height:1.1}
+  .lp-sec .sub{color:var(--ink-dim);text-align:center;max-width:60ch;margin:16px auto 0;font-size:16.5px}
+
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+  .step{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);
+    border-radius:18px;padding:26px 24px;position:relative}
+  .step .num{font-family:"SF Mono",monospace;font-size:12px;color:var(--gold);letter-spacing:.14em}
+  .step h3{font-size:19px;margin:12px 0 8px}
+  .step p{color:var(--ink-dim);font-family:system-ui,sans-serif;font-size:14px;margin:0;line-height:1.5}
+
+  .feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:48px}
+  .feat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px 22px;
+    transition:.18s;position:relative;overflow:hidden}
+  .feat:hover{border-color:var(--moss);transform:translateY(-3px)}
+  .feat .ic{width:40px;height:40px;border-radius:11px;background:rgba(127,174,85,.12);
+    border:1px solid rgba(127,174,85,.28);display:flex;align-items:center;justify-content:center;
+    font-size:20px;margin-bottom:16px}
+  .feat h3{font-size:17px;margin-bottom:8px}
+  .feat p{color:var(--ink-dim);font-family:system-ui,sans-serif;font-size:13.5px;margin:0;line-height:1.5}
+
+  /* ---------- PRICING ---------- */
+  .price-wrap{display:flex;justify-content:center;margin-top:46px}
+  .price{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--gold);
+    border-radius:22px;padding:38px 34px;max-width:420px;width:100%;box-shadow:var(--shadow);
+    position:relative;overflow:hidden}
+  .price::before{content:"";position:absolute;inset:0;background:
+    radial-gradient(400px 200px at 100% 0,rgba(214,169,78,.12),transparent 60%);pointer-events:none}
+  .price .ribbon{display:inline-block;font-family:"SF Mono",monospace;font-size:10.5px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--bg);background:var(--gold);border-radius:99px;padding:5px 13px;
+    margin-bottom:20px}
+  .price h3{font-size:24px}
+  .price .amt{font-size:56px;font-weight:600;color:var(--gold-soft);margin:10px 0 2px;line-height:1}
+  .price .amt small{font-size:17px;color:var(--ink-dim);font-weight:400}
+  .price .pdesc{color:var(--ink-dim);font-family:system-ui,sans-serif;font-size:14px;margin:0 0 22px}
+  .price ul{list-style:none;padding:0;margin:0 0 26px;display:flex;flex-direction:column;gap:11px}
+  .price li{font-family:system-ui,sans-serif;font-size:14.5px;color:var(--ink);display:flex;gap:11px;align-items:flex-start}
+  .price li .ck{color:var(--moss);flex:0 0 auto;font-weight:700}
+  .price .btn{width:100%;justify-content:center;text-align:center}
+
+  /* ---------- AUTH ---------- */
+  .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;
+    position:relative;overflow:hidden}
+  .auth-wrap .antlers{position:absolute;inset:0;opacity:.08;pointer-events:none}
+  .auth-card{position:relative;z-index:2;width:100%;max-width:420px;
+    background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);
+    border-radius:22px;padding:38px 34px;box-shadow:var(--shadow)}
+  .auth-card .back{display:inline-flex;align-items:center;gap:7px;font-family:system-ui,sans-serif;
+    font-size:13px;color:var(--ink-dim);background:none;border:none;cursor:pointer;padding:0;margin-bottom:22px}
+  .auth-card .back:hover{color:var(--gold-soft)}
+  .auth-brand{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+  .auth-brand .mk{width:38px;height:38px}
+  .auth-card h2{font-size:25px;margin-bottom:6px}
+  .auth-card .asub{color:var(--ink-dim);font-family:system-ui,sans-serif;font-size:14px;margin:0 0 26px}
+  .seg{display:flex;background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:24px}
+  .seg button{flex:1;font-family:system-ui,sans-serif;font-size:14px;font-weight:600;color:var(--ink-dim);
+    background:transparent;border:none;border-radius:9px;padding:10px;cursor:pointer;transition:.15s}
+  .seg button.on{background:var(--gold);color:var(--bg)}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-family:"SF Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-dim);margin-bottom:7px}
+  .field input{width:100%;font-family:system-ui,sans-serif;font-size:15px;color:var(--ink);
+    background:rgba(0,0,0,.24);border:1px solid var(--line);border-radius:11px;padding:13px 15px;transition:.15s}
+  .field input:focus{outline:none;border-color:var(--gold);background:rgba(0,0,0,.32)}
+  .field input::placeholder{color:var(--ink-dim);opacity:.6}
+  .auth-card .submit{width:100%;justify-content:center;margin-top:8px}
+  .auth-msg{font-family:system-ui,sans-serif;font-size:13px;margin-top:16px;padding:11px 14px;
+    border-radius:10px;line-height:1.4;display:none}
+  .auth-msg.show{display:block}
+  .auth-msg.err{background:rgba(200,98,58,.1);border:1px solid rgba(200,98,58,.34);color:#e8a488}
+  .auth-msg.ok{background:rgba(127,174,85,.1);border:1px solid rgba(127,174,85,.34);color:var(--moss)}
+  .auth-foot{text-align:center;font-family:system-ui,sans-serif;font-size:12px;color:var(--ink-dim);
+    margin-top:22px;line-height:1.5}
+  .demo-tag{position:fixed;bottom:14px;right:14px;z-index:60;font-family:"SF Mono",monospace;font-size:10.5px;
+    letter-spacing:.08em;color:var(--gold-soft);background:rgba(31,42,23,.92);border:1px solid var(--line);
+    border-radius:9px;padding:7px 12px;box-shadow:var(--shadow);display:none}
+
+  @media (max-width:760px){.steps{grid-template-columns:1fr}}
+  @media (max-width:640px){
+    .lp-hero .inner{padding-bottom:50px}
+    .auth-card{padding:30px 24px}
+    .lp-nav{gap:8px;padding:16px}
+    .lp-nav .btn{padding:9px 14px;font-size:13px;white-space:nowrap}
+    .lp-strip .cell{flex-basis:50%;border-bottom:1px solid var(--line)}
+  }
+  @media (max-width:420px){
+    .lp-nav .btn.ghost{display:none}
+    .brand .bt span{display:none}
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <svg class="antlers" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <g fill="none" stroke="#7fae55" stroke-width="2" stroke-linecap="round">
-      <path d="M600 300 L600 150 M600 170 C560 130 540 90 545 60 M600 190 C650 150 675 110 668 78 M600 150 C570 120 555 95 560 70 M600 150 C640 118 660 92 654 66 M545 60 C540 45 548 35 556 40 M668 78 C674 62 666 50 658 56"/>
-      <path d="M200 300 L200 200 M200 210 C175 185 165 160 170 145 M200 210 C230 182 245 158 238 142"/>
-      <path d="M1000 300 L1000 200 M1000 210 C975 185 965 160 970 145 M1000 210 C1030 182 1045 158 1038 142"/>
-    </g>
-  </svg>
-  <div class="wrap hero">
-    <div class="eyebrow">Permis de vânătoare · România</div>
-    <h1>Pregătește-te pentru <em>examenul de vânător</em></h1>
-    <p>Flashcards, teste-grilă pe capitole și fișe rapide, construite din programa oficială. Învață în ritmul tău și verifică-te ca la examenul real.</p>
-    <div class="src">Sursă: <b>Anexa nr. 5 la Ordinul 302/2014</b> (Anexa nr. 6 la Regulamentul permiselor de vânătoare), actualizată conform <b>Legii 171/2022</b> · Perioade: <b>Anexa nr. 1, Legea 407/2006</b></div>
-    <div class="strip">
-      <div class="cell"><div class="n">953</div><div class="l">întrebări în aplicație</div></div>
-      <div class="cell"><div class="n">30</div><div class="l">întrebări la examen</div></div>
-      <div class="cell"><div class="n">20</div><div class="l">corecte = promovat</div></div>
-      <div class="cell"><div class="n">10</div><div class="l">capitole</div></div>
+<!-- ============================================================
+     ÉCRAN 1 — PAGINA DE PREZENTARE (LANDING)
+     ============================================================ -->
+<div id="screen-landing" class="screen">
+  <header class="lp-hero">
+    <svg class="antlers" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g fill="none" stroke="#7fae55" stroke-width="2" stroke-linecap="round">
+        <path d="M600 300 L600 150 M600 170 C560 130 540 90 545 60 M600 190 C650 150 675 110 668 78 M600 150 C570 120 555 95 560 70 M600 150 C640 118 660 92 654 66 M545 60 C540 45 548 35 556 40 M668 78 C674 62 666 50 658 56"/>
+        <path d="M200 300 L200 200 M200 210 C175 185 165 160 170 145 M200 210 C230 182 245 158 238 142"/>
+        <path d="M1000 300 L1000 200 M1000 210 C975 185 965 160 970 145 M1000 210 C1030 182 1045 158 1038 142"/>
+      </g>
+    </svg>
+
+    <div class="lp-nav">
+      <a class="brand" href="#" onclick="return false">
+        <svg class="mk" viewBox="0 0 40 40" fill="none" stroke="#d6a94e" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+          <path d="M20 38 L20 18 M20 20 C13 14 10 8 12 4 M20 20 C27 14 30 8 28 4 M20 16 C15 11 13 7 15 5 M20 16 C25 11 27 7 25 5"/>
+        </svg>
+        <span class="bt"><b>Vânător</b><span>Revizuire examen</span></span>
+      </a>
+      <div class="spacer"></div>
+      <button class="btn ghost" onclick="showAuth('login')">Intră în cont</button>
+      <button class="btn primary" onclick="showAuth('signup')">Începe gratuit</button>
+    </div>
+
+    <div class="inner">
+      <div class="lp-badge"><span class="dot"></span>Gratuit · în fază de test</div>
+      <h1>Ia-ți <em>permisul de vânătoare</em> din prima încercare</h1>
+      <p class="lead">Platforma completă de pregătire pentru examenul de vânător din România: simulări reale, flashcards, teste-grilă pe capitole și fișe rapide — totul construit din programa oficială a Ministerului Mediului.</p>
+      <div class="lp-cta">
+        <button class="btn lg hero-primary" onclick="showAuth('signup')">Creează cont gratuit →</button>
+        <button class="btn lg ghost" onclick="showAuth('login')">Am deja cont</button>
+        <span class="note">Fără card. <b>Gratuit</b> pe toată perioada de test.</span>
+      </div>
+      <div class="lp-strip">
+        <div class="cell"><div class="n">953</div><div class="l">întrebări oficiale</div></div>
+        <div class="cell"><div class="n">30</div><div class="l">întrebări la examen</div></div>
+        <div class="cell"><div class="n">20</div><div class="l">corecte = promovat</div></div>
+        <div class="cell"><div class="n">10</div><div class="l">capitole acoperite</div></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CUM FUNCȚIONEAZĂ -->
+  <section class="lp-sec">
+    <div class="lp-eyebrow">Cum funcționează</div>
+    <h2>De la programă la promovare, în trei pași</h2>
+    <p class="sub">Un traseu clar de învățare, gândit ca să treci examenul real — nu doar ca să citești.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="num">01</div>
+        <h3>Creează-ți contul</h3>
+        <p>Te înscrii gratuit cu email și parolă. Progresul tău te așteaptă de fiecare dată când revii.</p>
+      </div>
+      <div class="step">
+        <div class="num">02</div>
+        <h3>Învață pe capitole</h3>
+        <p>Flashcards și teste-grilă pentru fiecare dintre cele 10 capitole. Vezi imediat unde stai bine și unde mai ai de lucru.</p>
+      </div>
+      <div class="step">
+        <div class="num">03</div>
+        <h3>Simulează examenul</h3>
+        <p>30 de întrebări, 60 de minute, prag de 20 corecte. Îți urmărești evoluția și reiei exact greșelile tale.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FUNCȚII -->
+  <section class="lp-sec tight">
+    <div class="lp-eyebrow">Tot ce ai nevoie</div>
+    <h2>Șapte instrumente de studiu într-un singur loc</h2>
+    <div class="feat-grid">
+      <div class="feat"><div class="ic">🎯</div><h3>Simulare de examen</h3><p>30 de întrebări extrase aleatoriu, cronometru de 60 de minute și corectare la final, exact ca la examenul real.</p></div>
+      <div class="feat"><div class="ic">🃏</div><h3>Flashcards</h3><p>Învățare activă pe capitole: citești, te gândești, întorci cardul. Marchezi ce ai știut și reiei restul.</p></div>
+      <div class="feat"><div class="ic">✅</div><h3>Teste-grilă</h3><p>10 întrebări pe capitol, cu feedback instant la fiecare răspuns și scor la final.</p></div>
+      <div class="feat"><div class="ic">📋</div><h3>Fișe rapide</h3><p>Cifrele și noțiunile care revin cel mai des în întrebări, gata de repetat înainte de examen.</p></div>
+      <div class="feat"><div class="ic">📅</div><h3>Perioade de vânătoare</h3><p>Datele legale de deschidere și închidere pe specii, mamifere și păsări, structurate clar.</p></div>
+      <div class="feat"><div class="ic">📈</div><h3>Istoricul examenelor</h3><p>Fiecare simulare se salvează automat. Îți vezi evoluția în timp față de pragul de promovare.</p></div>
+      <div class="feat"><div class="ic">🔁</div><h3>Greșelile mele</h3><p>Un chestionar construit automat din tot ce ai greșit. Exersezi exact ce nu știi încă.</p></div>
+    </div>
+  </section>
+
+  <!-- PREȚ -->
+  <section class="lp-sec tight" id="pret">
+    <div class="lp-eyebrow">Preț</div>
+    <h2>O singură ofertă, complet gratuită</h2>
+    <p class="sub">Suntem în fază de test. Ai acces la tot, fără costuri și fără card. Creezi cont și începi.</p>
+    <div class="price-wrap">
+      <div class="price">
+        <div class="ribbon">Fază de test</div>
+        <h3>Gratuit</h3>
+        <div class="amt">0 lei<small> / lună</small></div>
+        <p class="pdesc">Acces complet la toate instrumentele de studiu.</p>
+        <ul>
+          <li><span class="ck">✓</span> Toate cele 953 de întrebări oficiale</li>
+          <li><span class="ck">✓</span> Simulări de examen nelimitate</li>
+          <li><span class="ck">✓</span> Flashcards și teste-grilă pe capitole</li>
+          <li><span class="ck">✓</span> Istoricul examenelor și greșelile tale</li>
+          <li><span class="ck">✓</span> Fișe rapide și perioade de vânătoare</li>
+        </ul>
+        <button class="btn primary lg" onclick="showAuth('signup')">Creează cont gratuit</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      Instrument de studiu neoficial, construit pentru pregătirea personală a examenului de vânător. Întrebările provin din setul oficial publicat de Ministerul Mediului, Apelor și Pădurilor. Verifică întotdeauna forma la zi a legislației înainte de examen.
+    </div>
+  </footer>
+</div>
+
+<!-- ============================================================
+     ÉCRAN 2 — ÎNSCRIERE / AUTENTIFICARE
+     ============================================================ -->
+<div id="screen-auth" class="screen">
+  <div class="auth-wrap">
+    <svg class="antlers" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g fill="none" stroke="#7fae55" stroke-width="2" stroke-linecap="round">
+        <path d="M600 300 L600 150 M600 170 C560 130 540 90 545 60 M600 190 C650 150 675 110 668 78 M600 150 C570 120 555 95 560 70 M600 150 C640 118 660 92 654 66 M545 60 C540 45 548 35 556 40 M668 78 C674 62 666 50 658 56"/>
+      </g>
+    </svg>
+    <div class="auth-card">
+      <button class="back" onclick="showLanding()">← Înapoi la prezentare</button>
+      <div class="auth-brand">
+        <svg class="mk" viewBox="0 0 40 40" fill="none" stroke="#d6a94e" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+          <path d="M20 38 L20 18 M20 20 C13 14 10 8 12 4 M20 20 C27 14 30 8 28 4 M20 16 C15 11 13 7 15 5 M20 16 C25 11 27 7 25 5"/>
+        </svg>
+      </div>
+      <h2 id="auth-title">Creează-ți contul</h2>
+      <p class="asub" id="auth-sub">Gratuit, în fază de test. Îți trebuie doar un email și o parolă.</p>
+
+      <div class="seg">
+        <button id="seg-signup" class="on" onclick="setAuthMode('signup')">Înscriere</button>
+        <button id="seg-login" onclick="setAuthMode('login')">Autentificare</button>
+      </div>
+
+      <form id="auth-form" onsubmit="return submitAuth(event)">
+        <div class="field">
+          <label for="au-email">Email</label>
+          <input id="au-email" type="email" autocomplete="email" placeholder="nume@exemplu.ro" required>
+        </div>
+        <div class="field">
+          <label for="au-pass">Parolă</label>
+          <input id="au-pass" type="password" autocomplete="current-password" placeholder="Minim 6 caractere" minlength="6" required>
+        </div>
+        <button type="submit" class="btn primary submit lg" id="auth-submit">Creează cont</button>
+      </form>
+
+      <div class="auth-msg" id="auth-msg"></div>
+      <p class="auth-foot" id="auth-foot">Prin crearea contului ești de acord cu utilizarea platformei în scop de studiu personal.</p>
     </div>
   </div>
-</header>
+</div>
+
+<!-- ============================================================
+     ÉCRAN 3 — APLICAȚIA DE REVIZUIRE (gardată)
+     ============================================================ -->
+<div id="screen-app" class="screen">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#" onclick="return false">
+        <svg class="mk" viewBox="0 0 40 40" fill="none" stroke="#d6a94e" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+          <path d="M20 38 L20 18 M20 20 C13 14 10 8 12 4 M20 20 C27 14 30 8 28 4 M20 16 C15 11 13 7 15 5 M20 16 C25 11 27 7 25 5"/>
+        </svg>
+        <span class="bt"><b>Vânător</b><span>Revizuire examen</span></span>
+      </a>
+      <div class="spacer"></div>
+      <div class="acct">
+        <span class="plan-pill">Gratuit</span>
+        <span class="who">Salut, <b id="acct-email">—</b></span>
+        <button class="btn ghost" onclick="signOut()">Deconectare</button>
+      </div>
+    </div>
+  </div>
+  <header>
+    <div class="wrap" style="padding:34px 20px 26px">
+      <div class="eyebrow">Permis de vânătoare · România</div>
+      <h1 style="font-size:clamp(28px,5vw,44px);line-height:1.05">Pregătește-te pentru <em>examenul de vânător</em></h1>
+      <p style="max-width:56ch;color:var(--ink-dim);font-size:16px;margin:14px 0 0">Alege un instrument de mai jos și învață în ritmul tău. Progresul se salvează pe acest dispozitiv.</p>
+    </div>
+  </header>
 
 <nav class="tabs">
   <div class="tabs-inner" id="tabs"></div>
@@ -365,6 +679,9 @@
     Instrument de studiu neoficial, construit pentru pregătirea personală a examenului de vânător. Întrebările provin din setul oficial publicat de Ministerul Mediului, Apelor și Pădurilor. Verifică întotdeauna forma la zi a legislației înainte de examen.
   </div>
 </footer>
+</div><!-- /#screen-app -->
+
+<div class="demo-tag" id="demo-tag">◆ Mod demo — fără Supabase configurat</div>
 
 <script>
 /* ============ DATE: întrebări oficiale (subset reprezentativ) ============ */
@@ -1721,6 +2038,194 @@ document.addEventListener('keydown',e=>{
     if(e.key===' '){e.preventDefault();flip();}
   }
 });
+</script>
+
+<!-- ============================================================
+     Barres collantes de l'app sous la barre de compte
+     ============================================================ -->
+<style>
+  #screen-app nav.tabs{top:58px}
+  #screen-app .ex-bar{top:112px}
+</style>
+
+<!-- ============================================================
+     AUTHENTIFICATION (Supabase) + routage des écrans
+     ============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* ====== CONFIG SUPABASE — remplace ces 2 valeurs pour activer les vrais comptes ======
+   1) Crée un projet gratuit sur https://supabase.com
+   2) Project Settings → API : copie "Project URL" et la clé "anon public" ci-dessous.
+   Tant qu'elles ne sont pas renseignées, le site tourne en MODE DÉMO (comptes stockés
+   localement dans le navigateur, sans sécurité réelle) pour te permettre de tester. */
+const SUPABASE_URL  = "https://mwkmcwoiiadebarkxrrk.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13a21jd29paWFkZWJhcmt4cnJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5MTkxMDQsImV4cCI6MjEwMzQ5NTEwNH0.37i4T127DmrP7CN3cRm5w5jralf92eQ3YIl9U-KKVIE";
+
+let sb = null;
+const SB_READY = SUPABASE_URL && !SUPABASE_URL.startsWith("TON_") &&
+                 SUPABASE_ANON && !SUPABASE_ANON.startsWith("TA_");
+if (SB_READY && window.supabase) {
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+}
+const DEMO = !sb;
+
+/* ============================================================
+   SYNCHRONISATION DU PROGRÈS PAR COMPTE (Supabase, table "progress")
+   - vhist (istoric examene) et vmiss (greșeli) suivent le compte
+   - fusion locale ↔ cloud à la connexion, push (débattu) à chaque changement
+   ============================================================ */
+const SYNC_KEYS = ['vhist','vmiss'];
+let syncUser = null;      // id utilisateur (mode Supabase uniquement)
+let syncTimer = null;
+const _rawSet = LS.set.bind(LS);   // écriture localStorage sans déclencher de push
+// on branche l'écriture de l'app : tout LS.set('vhist'|'vmiss', …) pousse vers le cloud
+LS.set = function(k, v){ _rawSet(k, v); if(syncUser && SYNC_KEYS.indexOf(k) !== -1) pushProgress(false); };
+
+function mergeHist(local, cloud){
+  const seen = new Set(), out = [];
+  [].concat(cloud||[], local||[]).forEach(e=>{
+    if(!e || typeof e.d === 'undefined' || seen.has(e.d)) return;
+    seen.add(e.d); out.push(e);
+  });
+  out.sort((a,b)=>a.d-b.d);
+  return out.slice(-300);
+}
+function mergeMiss(local, cloud){
+  const out = Object.assign({}, cloud||{});
+  const l = local||{};
+  Object.keys(l).forEach(k=>{
+    out[k] = out[k] ? Object.assign({}, out[k], {n: Math.max(out[k].n||0, l[k].n||0)}) : l[k];
+  });
+  return out;
+}
+async function pullProgress(){
+  if(!sb || !syncUser) return;
+  try{
+    const {data,error} = await sb.from('progress').select('vhist,vmiss').eq('user_id',syncUser).maybeSingle();
+    if(error) throw error;
+    const mHist = mergeHist(LS.get('vhist',[]), (data&&data.vhist)||[]);
+    const mMiss = mergeMiss(LS.get('vmiss',{}), (data&&data.vmiss)||{});
+    _rawSet('vhist', mHist); _rawSet('vmiss', mMiss);
+    try{ if(typeof renderHist==='function') renderHist(); }catch(e){}
+    try{ if(typeof renderMissHome==='function') renderMissHome(); }catch(e){}
+    await pushProgress(true);   // renvoie la fusion au cloud
+  }catch(e){ console.warn('pullProgress:', e.message); }
+}
+async function pushProgress(immediate){
+  if(!sb || !syncUser) return;
+  const doPush = async ()=>{
+    try{
+      const {error} = await sb.from('progress').upsert({
+        user_id: syncUser,
+        vhist: LS.get('vhist',[]),
+        vmiss: LS.get('vmiss',{}),
+        updated_at: new Date().toISOString()
+      }, {onConflict:'user_id'});
+      if(error) throw error;
+    }catch(e){ console.warn('pushProgress:', e.message); }
+  };
+  if(immediate){ clearTimeout(syncTimer); await doPush(); return; }
+  clearTimeout(syncTimer); syncTimer = setTimeout(doPush, 900);   // anti-rafale
+}
+function syncOnAuth(user){
+  syncUser = (user && user.id) ? user.id : null;
+  if(syncUser) pullProgress();
+}
+function syncOnSignOut(){
+  syncUser = null;
+  // on nettoie le progrès local pour ne pas fuiter entre comptes sur un appareil partagé
+  _rawSet('vhist', []); _rawSet('vmiss', {});
+  try{ if(typeof renderHist==='function') renderHist(); }catch(e){}
+  try{ if(typeof renderMissHome==='function') renderMissHome(); }catch(e){}
+}
+
+/* ---------- routage écrans ---------- */
+function screens(id){
+  ['screen-landing','screen-auth','screen-app'].forEach(s=>{
+    document.getElementById(s).classList.toggle('show', s===id);
+  });
+  window.scrollTo(0,0);
+}
+function showLanding(){ screens('screen-landing'); }
+function showAuth(mode){ setAuthMode(mode||'signup'); clearAuthMsg();
+  document.getElementById('auth-form').reset(); screens('screen-auth');
+  setTimeout(()=>{try{document.getElementById('au-email').focus();}catch(e){}},60); }
+function showApp(email){ document.getElementById('acct-email').textContent = email||'vânător'; screens('screen-app'); }
+
+/* ---------- bascule Înscriere / Autentificare ---------- */
+let authMode='signup';
+function setAuthMode(m){
+  authMode=m;
+  document.getElementById('seg-signup').classList.toggle('on', m==='signup');
+  document.getElementById('seg-login').classList.toggle('on', m==='login');
+  document.getElementById('auth-title').textContent = m==='signup' ? 'Creează-ți contul' : 'Bine ai revenit';
+  document.getElementById('auth-sub').textContent = m==='signup'
+    ? 'Gratuit, în fază de test. Îți trebuie doar un email și o parolă.'
+    : 'Intră în cont ca să continui pregătirea.';
+  document.getElementById('auth-submit').textContent = m==='signup' ? 'Creează cont' : 'Autentifică-te';
+  document.getElementById('au-pass').setAttribute('autocomplete', m==='signup' ? 'new-password' : 'current-password');
+  clearAuthMsg();
+}
+function authMsg(txt, kind){ const el=document.getElementById('auth-msg');
+  el.textContent=txt; el.className='auth-msg show '+(kind||'err'); }
+function clearAuthMsg(){ const el=document.getElementById('auth-msg');
+  el.className='auth-msg'; el.textContent=''; }
+
+/* ---------- soumission ---------- */
+const DEMO_SESSION='vdemo_session', DEMO_USERS='vdemo_users';
+async function submitAuth(e){
+  e.preventDefault();
+  const email=document.getElementById('au-email').value.trim().toLowerCase();
+  const pass=document.getElementById('au-pass').value;
+  const btn=document.getElementById('auth-submit'); btn.disabled=true;
+  try{
+    if(DEMO){
+      const users=JSON.parse(localStorage.getItem(DEMO_USERS)||'{}');
+      if(authMode==='signup'){
+        if(users[email]){ authMsg('Există deja un cont cu acest email. Autentifică-te.'); setAuthMode('login'); return false; }
+        users[email]=pass; localStorage.setItem(DEMO_USERS,JSON.stringify(users));
+      } else {
+        if(!users[email] || users[email]!==pass){ authMsg('Email sau parolă greșite.'); return false; }
+      }
+      localStorage.setItem(DEMO_SESSION,email);
+      showApp(email); return false;
+    }
+    if(authMode==='signup'){
+      const {data,error}=await sb.auth.signUp({email,password:pass});
+      if(error) throw error;
+      if(data.session){ showApp(email); syncOnAuth(data.user); }
+      else { authMsg('Cont creat! Verifică-ți emailul pentru confirmare, apoi autentifică-te.','ok'); setAuthMode('login'); }
+    } else {
+      const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+      if(error) throw error;
+      showApp(data.user.email); syncOnAuth(data.user);
+    }
+  }catch(err){
+    authMsg((err && err.message) ? err.message : 'A apărut o eroare. Încearcă din nou.');
+  }finally{ btn.disabled=false; }
+  return false;
+}
+
+async function signOut(){
+  if(DEMO){ localStorage.removeItem(DEMO_SESSION); }
+  else { syncOnSignOut(); if(sb){ try{ await sb.auth.signOut(); }catch(e){} } }
+  showLanding();
+}
+
+/* ---------- init : session existante ? ---------- */
+(async function initAuth(){
+  if(DEMO){ document.getElementById('demo-tag').style.display='block'; }
+  let email=null;
+  try{
+    if(DEMO){ email=localStorage.getItem(DEMO_SESSION); }
+    else if(sb){
+      const {data}=await sb.auth.getSession();
+      const u=(data&&data.session&&data.session.user)?data.session.user:null;
+      if(u){ email=u.email; showApp(email); syncOnAuth(u); return; }
+    }
+  }catch(e){}
+  if(email) showApp(email); else showLanding();
+})();
 </script>
 </body>
 </html>
